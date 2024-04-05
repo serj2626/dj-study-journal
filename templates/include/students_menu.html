@@ -1,0 +1,40 @@
+{% load static %}
+<div class="sidebar pt-5">
+    <button class="btn btn-warning border-2 border-white">Студент</button>
+    <div class="text-center">
+        <img src="{% static 'img/profile.png' %}" class="w-50 h-50 rounded-circle mb-2">
+    </div>
+
+    <div class="list-group">
+        <a href="" class="list-group-item list-group-item-action">Расписание</a>
+        <a href="{% url 'students_my_group' %}" class="list-group-item list-group-item-action">
+            Моя группа
+        </a>
+        <a href="{% url 'teachers_list' %}"
+            class="list-group-item list-group-item-action">Преподаватели</a>
+        <a href="{% url 'accounts:my_profile' %}" class="list-group-item list-group-item-action">Настройки</a>
+        <a href="{% url 'my_marks' %}" class="list-group-item list-group-item-action">Мои оценки</a>
+        <a href="" class="list-group-item list-group-item-action">Моя посещаемость</a>
+        <a href="{% url 'feedback_student_create' %}"
+            class="list-group-item list-group-item-action">Обратная связь</a>
+        <a href="{% url 'chat' %}"
+            class="list-group-item list-group-item-action d-flex justify-content-between py-0">
+            <p>Сообщения</p>
+            <p class="text-danger"> 14</p>
+        </a>
+        <a href="{% url 'notification_student' %}"
+            class="list-group-item list-group-item-action d-flex justify-content-between py-0">
+            <p>Увемления</p>
+            <p class="text-danger"> 14</p>
+        </a>
+        <a href="{% url 'chat' %}"
+            class="list-group-item list-group-item-action d-flex justify-content-between py-0">
+            <p>Предстоящие события</p>
+            <p class="text-danger"> 14</p>
+        </a>
+    </div>
+
+    <div>
+        <button type="button" class="btn btn-danger w-100">Выход</button>
+    </div>
+</div>
