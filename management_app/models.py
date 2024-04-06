@@ -1,4 +1,3 @@
-
 import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -11,7 +10,7 @@ class CustomUser(AbstractUser):
     '''
     Модель пользователя
     '''
-    user_type_data = ((1, "Админ"), (2, "Персонал"), (3, "Студент"))
+    user_type_data = ((1, "Админ"), (2, "Преподаватель"), (3, "Студент"))
     user_type = models.CharField(
         default=1, choices=user_type_data, max_length=10)
 
@@ -68,9 +67,9 @@ class AdminHOD(models.Model):
         verbose_name_plural = "Администраторы"
 
 
-class Staff(models.Model):
+class Teacher(models.Model):
     '''
-    Модель сотрудника
+    Модель преподавателя
     '''
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(
@@ -116,8 +115,8 @@ class Subject(models.Model):
         max_length=255, verbose_name="Название предмета")
     course = models.ForeignKey(
         Course, on_delete=models.CASCADE, default=1, verbose_name="Курс")
-    staff = models.ForeignKey(
-        CustomUser, on_delete=models.CASCADE, verbose_name="Персонал")
+    teacher = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, verbose_name="Преподаватель")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлен")
 
@@ -191,13 +190,13 @@ class LeaveReportStudent(models.Model):
         verbose_name_plural = "Отчеты о выходе"
 
 
-class LeaveReportStaff(models.Model):
+class LeaveReportTeacher(models.Model):
     '''
-    Модель отчета о выходе сотрудника
+    Модель отчета о выходе преподавателя
     '''
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    staff = models.ForeignKey(
-        Staff, on_delete=models.CASCADE, verbose_name="Сотрудник")
+    teacher = models.ForeignKey(
+        Teacher, on_delete=models.CASCADE, verbose_name="Преподаватель")
     leave_date = models.CharField(max_length=255, verbose_name="Дата выхода")
     leave_message = models.TextField(verbose_name="Сообщение")
     leave_status = models.BooleanField(default=False, verbose_name="Статус")
@@ -205,11 +204,11 @@ class LeaveReportStaff(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлен")
 
     def __str__(self):
-        return f'Отчет о выходе {self.staff.user.username}'
+        return f'Отчет о выходе {self.teacher.user.username}'
 
     class Meta:
-        verbose_name = "Отчет о выходе"
-        verbose_name_plural = "Отчеты о выходе"
+        verbose_name = "Отчет о выходе преподавателя"
+        verbose_name_plural = "Отчеты о выходе преподавателя"
 
 
 class FeedBackStudent(models.Model):
@@ -235,13 +234,13 @@ class FeedBackStudent(models.Model):
         verbose_name_plural = "Обратная связь студента"
 
 
-class FeedBackStaff(models.Model):
+class FeedBackTeacher(models.Model):
     '''
-    Модель обратной связи сотрудника
+    Модель обратной связи преподавателя
     '''
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    staff = models.ForeignKey(
-        Staff, on_delete=models.CASCADE, verbose_name="Сотрудник")
+    teacher = models.ForeignKey(
+        Teacher, on_delete=models.CASCADE, verbose_name="Преподаватель")
     theme = models.CharField(
         max_length=255, verbose_name="Тема", blank=True, null=True)
     feedback = models.TextField(verbose_name="Отзыв")
@@ -251,11 +250,11 @@ class FeedBackStaff(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлен")
 
     def __str__(self):
-        return f'Обратная связь сотрудника {self.staff.user.username}'
+        return f'Обратная связь преподавателя {self.teacher.user.username}'
 
     class Meta:
-        verbose_name = "Обратная связь сотрудника"
-        verbose_name_plural = "Обратная связь сотрудника"
+        verbose_name = "Обратная связь преподавателя"
+        verbose_name_plural = "Обратная связь преподавателя"
 
 
 class NotificationStudent(models.Model):
@@ -277,45 +276,24 @@ class NotificationStudent(models.Model):
         verbose_name_plural = "Уведомления студента"
 
 
-class NotificationStaff(models.Model):
+class NotificationTeacher(models.Model):
     '''
     Модель уведомления сотрудника
     '''
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    staff_id = models.ForeignKey(
-        Staff, on_delete=models.CASCADE, verbose_name="Сотрудник")
+    teacher_id = models.ForeignKey(
+        Teacher, on_delete=models.CASCADE, verbose_name="Сотрудник")
     message = models.TextField(verbose_name="Сообщение")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлен")
 
     def __str__(self):
-        return f'Уведомление сотрудника {self.staff.user.username}'
+        return f'Уведомление сотрудника {self.teacher.user.username}'
 
     class Meta:
         verbose_name = "Уведомление сотрудника"
         verbose_name_plural = "Уведомления сотрудника"
 
-
-@receiver(post_save, sender=CustomUser)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        if instance.user_type == 1:
-            AdminHOD.objects.create(user=instance)
-        if instance.user_type == 2:
-            Staff.objects.create(user=instance, address="")
-        if instance.user_type == 3:
-            Student.objects.create(user=instance, course_id=Course.objects.get(
-                id=1), session_start_year="2024-01-01", session_end_year="2024-01-01", address="")
-
-
-@receiver(post_save, sender=CustomUser)
-def save_user_profile(sender, instance, **kwargs):
-    if instance.user_type == 1:
-        instance.adminhod.save()
-    if instance.user_type == 2:
-        instance.staffs.save()
-    if instance.user_type == 3:
-        instance.Student.save()
 
 
 class SessionYearModel(models.Model):
@@ -332,3 +310,58 @@ class SessionYearModel(models.Model):
     class Meta:
         verbose_name = "Сессия"
         verbose_name_plural = "Сессии"
+
+
+class RaitingStar(models.Model):
+    '''Модель рейтинга'''
+    raiting = models.IntegerField(verbose_name="Рейтинг")
+
+    def __str__(self):
+        return f'{self.raiting}'
+
+    class Meta:
+        verbose_name = "Рейтинг"
+        verbose_name_plural = "Рейтинги"
+
+
+class RaitingTeacher(models.Model):
+    '''Модель рейтинга преподавателя'''
+
+    teacher = models.ForeignKey(
+        Teacher, on_delete=models.CASCADE, verbose_name="Преподаватель", related_name="teacher")
+    raiting = models.ForeignKey(
+        RaitingStar, on_delete=models.CASCADE, verbose_name="Рейтинг")
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, verbose_name="Пользователь")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлен")
+
+    def __str__(self):
+        return f'{self.teacher.user.username} - {self.raiting.raiting}'
+
+    class Meta:
+        verbose_name = "Рейтинг преподавателя"
+        verbose_name_plural = "Рейтинги преподавателя"
+
+
+
+@receiver(post_save, sender=CustomUser)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        if instance.user_type == 1:
+            AdminHOD.objects.create(user=instance)
+        if instance.user_type == 2:
+            Teacher.objects.create(user=instance, address="")
+        if instance.user_type == 3:
+            Student.objects.create(user=instance, course_id=Course.objects.get(
+                id=1), session_start_year="2024-01-01", session_end_year="2024-01-01", address="")
+
+
+@receiver(post_save, sender=CustomUser)
+def save_user_profile(sender, instance, **kwargs):
+    if instance.user_type == 1:
+        instance.AdminHOD.save()
+    if instance.user_type == 2:
+        instance.Teacher.save()
+    if instance.user_type == 3:
+        instance.Student.save()

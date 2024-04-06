@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from management_app.models import Student, Staff
+from management_app.models import Student, Teacher
 
 User = get_user_model()
 

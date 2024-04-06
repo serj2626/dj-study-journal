@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from common.utils import TitleMixin
 from management_app.models import FeedBackStudent
-from .forms import FeedBackStudentForm, FeedBackStaffForm
+from .forms import FeedBackStudentForm, FeedBackTeacherForm
 from django.views.generic.edit import CreateView
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
@@ -47,6 +47,6 @@ class NotificationStudentView(TitleMixin, TemplateView):
     title = 'Уведомления'
     template_name = 'management_app/notification_student.html'
 
-class NotificationStaffView(TitleMixin, TemplateView):
+class NotificationTeacherView(TitleMixin, TemplateView):
     title = 'Уведомления'
-    template_name = 'management_app/notification_staff.html'
+    template_name = 'management_app/notification_teacher.html'

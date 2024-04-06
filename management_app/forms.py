@@ -1,5 +1,5 @@
 from django import forms
-from .models import FeedBackStudent, FeedBackStaff
+from .models import FeedBackStudent, FeedBackTeacher
 
 
 class FeedBackStudentForm(forms.ModelForm):
@@ -14,7 +14,7 @@ class FeedBackStudentForm(forms.ModelForm):
         fields = ('theme', 'feedback',)
 
 
-class FeedBackStaffForm(forms.ModelForm):
+class FeedBackTeacherForm(forms.ModelForm):
     class Meta:
-        model = FeedBackStaff
+        model = FeedBackTeacher
         fields = ('theme', 'feedback',)
